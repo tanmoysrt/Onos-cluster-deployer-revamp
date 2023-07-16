@@ -1,0 +1,14 @@
+[Unit]
+Description=Onos Cluster Manager Service
+Requires=network.target
+After=systemd-user-sessions.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/cl_manager
+
+[Install]
+WantedBy=multi-user.target

@@ -169,6 +169,7 @@
         let availableNodes = [];
         let selectedNodesForAtomixDeploy = [];
         let selectedNodesForOnosDeploy = [];
+        let onosCardClickTimer = null;
     </script>
 
     <script>
@@ -241,7 +242,7 @@
                     var html = "";
                     var keys = Object.keys(onosNode);
                     for (var i = 0; i < keys.length; i++) {
-                        html += '<div class="nodecard border border-2 rounded" style="cursor: pointer" onclick=\'openOnosDashboard("'+keys[i]+'")\' ondoubleclick=\'deleteNodeOnos("'+keys[i]+'")\'>';
+                        html += '<div class="nodecard border border-2 rounded" style="cursor: pointer" onclick=\'onClickOnosNodeCard("'+keys[i]+'")\'>';
                         if (onosNode[keys[i]])
                             html += '<div class="active-pulse me-3"></div>';
                         else
@@ -256,6 +257,19 @@
                     $("#onos_nodes").html(html);
                 }
             });
+        }
+
+        function onClickOnosNodeCard(ip){
+            if (onosCardClickTimer != null) {
+                clearTimeout(onosCardClickTimer);
+                onosCardClickTimer = null;
+                deleteNodeOnos(ip);
+            } else {
+                onosCardClickTimer = setTimeout(function () {
+                    onosCardClickTimer = null;
+                    openOnosDashboard(ip);
+                }, 300);
+            }
         }
 
         function openOnosDashboard(ip){
