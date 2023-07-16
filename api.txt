@@ -1,0 +1,6 @@
+http://127.0.0.1:8080/onos/config?hostname=fqdn
+
+http://127.0.0.1:8080/admin/atomix/deploy?image=atomix:custom
+http://127.0.0.1:8080/admin/atomix/delete
+http://127.0.0.1:8080/admin/onos/deploy?image=onos:custom
+http://127.0.0.1:8080/admin/onos/delete
