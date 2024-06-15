@@ -22,6 +22,9 @@ import (
 //go:embed view/*.html
 var views embed.FS
 
+//go:embed all:static
+var staticFiles embed.FS
+
 func main() {
 	if os.Getenv("PASSWORD") == "" {
 		log.Fatal("PASSWORD environment variable not set")
@@ -64,9 +67,15 @@ func main() {
 	}
 	server.Pre(middleware.RemoveTrailingSlash())
 	server.Use(middleware.CORS())
+	server.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:       "/static",
+		Browse:     false,
+		IgnoreBase: false,
+		Filesystem: http.FS(staticFiles),
+	}))
 
-	server.Pre(func (next echo.HandlerFunc) echo.HandlerFunc {
-		return func (c echo.Context) error {
+	server.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
 			if strings.Contains(c.Request().RequestURI, "admin") {
 				cookie, err := c.Cookie("sessionID")
 				if err != nil {
@@ -79,7 +88,6 @@ func main() {
 			return next(c)
 		}
 	})
-	
 
 	// --- CONFIG API ---
 
@@ -148,7 +156,6 @@ func main() {
 
 		return c.String(200, string(jsonData))
 	})
-
 
 	// --- FETCH NODES ---
 	server.GET("/admin/nodes", func(c echo.Context) error {
@@ -230,14 +237,13 @@ func main() {
 		status := manager.ServiceExists("atomix")
 		return c.String(200, strconv.FormatBool(status))
 	})
-	
+
 	// Get onos service status
 	server.GET("/admin/onos/status", func(c echo.Context) error {
 		// Create onos service
 		status := manager.ServiceExists("onos")
 		return c.String(200, strconv.FormatBool(status))
 	})
-
 
 	// -- SERVICE DELETE --
 
@@ -326,7 +332,6 @@ func main() {
 		}
 		return c.String(200, token.JoinTokens.Worker)
 	})
-
 
 	// Rediretc
 	server.GET("/", func(c echo.Context) error {
